@@ -1,5 +1,6 @@
 package com.back.p67260811.global.initData;
 
+import com.back.p67260811.domain.member.entity.Member;
 import com.back.p67260811.domain.member.service.MemberService;
 import com.back.p67260811.domain.post.post.entity.Post;
 import com.back.p67260811.domain.post.post.service.PostService;
@@ -10,6 +11,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Configuration
 @RequiredArgsConstructor
@@ -35,9 +38,12 @@ public class BaseInitData {
             return;
         }
 
-        Post post1 = postService.write("제목1", "내용1");
-        Post post2 = postService.write("제목2", "내용2");
-        Post post3 = postService.write("제목3", "내용3");
+        Member m1 = memberService.findByUsername("user1").get();
+        Member m2 = memberService.findByUsername("user2").get();
+
+        Post post1 = postService.write(m1, "제목1", "내용1");
+        Post post2 = postService.write(m1, "제목2", "내용2");
+        Post post3 = postService.write(m2, "제목3", "내용3");
 
         post1.addComment("댓글 1-1");
         post1.addComment("댓글 1-2");
