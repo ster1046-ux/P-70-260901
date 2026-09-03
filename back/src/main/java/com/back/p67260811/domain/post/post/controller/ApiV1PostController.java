@@ -6,6 +6,7 @@ import com.back.p67260811.domain.post.post.dto.PostDto;
 import com.back.p67260811.domain.post.post.entity.Post;
 import com.back.p67260811.domain.post.post.service.PostService;
 import com.back.p67260811.global.dto.RsData;
+import com.back.p67260811.global.rq.Rq;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -16,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/posts")
@@ -24,6 +24,7 @@ public class ApiV1PostController {
 
     private final PostService postService;
     private final MemberService memberService;
+    private final Rq rq;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<PostDto> list() {
@@ -62,17 +63,10 @@ public class ApiV1PostController {
     @PostMapping
     @Transactional
     public RsData<PostDto> write(
-            @Valid @RequestBody PostWriteReqBody reqBody,
-            @RequestParam String username,
-            @RequestParam String password
+            @Valid @RequestBody PostWriteReqBody reqBody
     ) {
 
-        Member actor = memberService.findByUsername(username).get();
-
-        if(!actor.getPassword().equals(password)) {
-            throw new ServiceException("401-1", "비밀번호가 일치하지 않습니다.");
-        }
-
+        Member actor = rq.getActor();
         Post post = postService.write(actor, reqBody.title, reqBody.content);
         return new RsData<>(
                 "201-1",
@@ -98,7 +92,15 @@ public class ApiV1PostController {
             @PathVariable int id,
             @Valid @RequestBody PostModifyReqBody reqBody
     ) {
+
+        Member actor = rq.getActor();
         Post post = postService.findById(id).get();
+        post.checkActorModify(actor);
+
+        if (!actor.equals(post.getAuthor())) {
+            throw new ServiceException("403-1", "수정 권한이 없습니다.");
+        }
+
         postService.modify(post, reqBody.title, reqBody.content);
 
         return new RsData<>(
@@ -111,6 +113,13 @@ public class ApiV1PostController {
     public RsData<Void> delete(
             @PathVariable int id
     ) {
+
+        Member actor = rq.getActor();
+        Post post = postService.findById(id).get();
+        post.checkActorDelete(actor);
+
+        if (!actor.equals(post.getAuthor())) throw new ServiceException("403-1", "삭제 권한이 없습니다.");
+
         postService.delete(id);
 
         return new RsData<>(
@@ -118,4 +127,6 @@ public class ApiV1PostController {
                 "%d번 게시물이 삭제되었습니다.".formatted(id)
         );
     }
+
+    // 인증 처리 메서드
 }

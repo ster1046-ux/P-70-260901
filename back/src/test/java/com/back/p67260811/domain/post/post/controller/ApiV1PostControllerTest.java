@@ -70,6 +70,7 @@ public class ApiV1PostControllerTest {
                 .perform(
                         post("/api/v1/posts")
                                 .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer user1")
                                 .content("""
                                         {
                                             "title": "%s",
@@ -107,6 +108,7 @@ public class ApiV1PostControllerTest {
                 .perform(
                         patch("/api/v1/posts/%d".formatted(targetId))
                                 .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer user1")
                                 .content("""
                                         {
                                             "title": "%s",
@@ -157,6 +159,7 @@ public class ApiV1PostControllerTest {
                 .andExpect(jsonPath("$.nickname").value("유저1"))
                 .andExpect(jsonPath("$.username").value("user1"));
 
+
     }
 
     @Test
@@ -167,6 +170,7 @@ public class ApiV1PostControllerTest {
         ResultActions resultActions = mvc
                 .perform(
                         delete("/api/v1/posts/%d".formatted(targetId))
+                                .header("Authorization", "Bearer user1")
                 )
                 .andDo(print());
 
@@ -193,6 +197,7 @@ public class ApiV1PostControllerTest {
                 .perform(
                         post("/api/v1/posts")
                                 .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer user1")
                                 .content("""
                                         {
                                             "title": "%s",
@@ -210,7 +215,6 @@ public class ApiV1PostControllerTest {
                 .andExpect(jsonPath("$.msg").value("title-NotBlank-제목을 입력해주세요.\ntitle-Size-제목은 2글자 이상 10글자 이하로 작성해주세요."));
 
 
-
     }
 
 
@@ -224,6 +228,7 @@ public class ApiV1PostControllerTest {
                 .perform(
                         post("/api/v1/posts")
                                 .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer user1")
                                 .content("""
                                         {
                                             "title": "%s",
