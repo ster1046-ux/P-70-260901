@@ -1,4 +1,4 @@
-package com.back.p67260811.domain.post.post.controller;
+package com.back.p67260811.domain.post.post;
 
 import com.back.p67260811.domain.post.post.entity.Post;
 import com.back.p67260811.domain.post.post.repository.PostRepository;

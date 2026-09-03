@@ -5,14 +5,14 @@ import com.back.p67260811.domain.member.entity.Member;
 import com.back.p67260811.domain.member.service.MemberService;
 import com.back.p67260811.global.dto.RsData;
 import com.back.p67260811.global.exception.ServiceException;
+import com.back.p67260811.global.rq.Rq;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ApiV1MemberController {
 
     private final MemberService memberService;
+    private final Rq rq;
 
     record JoinReqBody(
             @NotBlank
@@ -89,6 +90,10 @@ public class ApiV1MemberController {
         }
         //3. 비밀 번호 맞으면 인증 데이터(apikey) 제공
 
+        //4. apiKey 쿠키 생성하고 전송
+        rq.addCookie("apiKey", actor.getApiKey());
+
+
         return new RsData(
                 "200-1",
                 "%s님 반갑습니다!".formatted(actor.getNickname()),
@@ -98,4 +103,18 @@ public class ApiV1MemberController {
                 )
         );
     }
+
+    @GetMapping("/me")
+    public RsData<MemberDto> me() {
+
+        Member actor = rq.getActor();
+
+        return new RsData(
+                "200-1",
+                "OK",
+                new MemberDto(actor)
+
+        );
+    }
+
 }
