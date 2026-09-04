@@ -20,5 +20,18 @@ public class AuthTokenService {
                 Map.of("id", member.getId(), "username", member.getUsername())
         );
     }
+    public Map<String, Object> payloadOrNull(String jwt) {
+        Map<String, Object> payload = Ut.jwt.payloadOrNull(jwt, secretPattern);
+
+        if(payload == null) {
+            return null;
+        }
+
+        int id = (int)payload.get("id");
+        String username = (String)payload.get("username");
+
+
+        return Map.of("id", id, "username", username);
+    }
 
 }
