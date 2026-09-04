@@ -1,5 +1,6 @@
 package com.back.p67260811.domain.post.post;
 
+import com.back.p67260811.domain.post.post.controller.ApiV1PostController;
 import com.back.p67260811.domain.post.post.entity.Post;
 import com.back.p67260811.domain.post.post.repository.PostRepository;
 import org.junit.jupiter.api.DisplayName;

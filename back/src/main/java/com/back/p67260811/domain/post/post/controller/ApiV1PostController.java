@@ -1,4 +1,4 @@
-package com.back.p67260811.domain.post.post;
+package com.back.p67260811.domain.post.post.controller;
 
 import com.back.p67260811.domain.member.entity.Member;
 import com.back.p67260811.domain.member.service.MemberService;
@@ -7,11 +7,11 @@ import com.back.p67260811.domain.post.post.entity.Post;
 import com.back.p67260811.domain.post.post.service.PostService;
 import com.back.p67260811.global.dto.RsData;
 import com.back.p67260811.global.rq.Rq;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
-import com.back.p67260811.global.exception.ServiceException;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +20,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/posts")
+@SecurityRequirement(name = "bearerAuth")
 public class ApiV1PostController {
 
     private final PostService postService;
@@ -97,10 +98,6 @@ public class ApiV1PostController {
         Post post = postService.findById(id).get();
         post.checkActorModify(actor);
 
-        if (!actor.equals(post.getAuthor())) {
-            throw new ServiceException("403-1", "수정 권한이 없습니다.");
-        }
-
         postService.modify(post, reqBody.title, reqBody.content);
 
         return new RsData<>(
@@ -117,8 +114,6 @@ public class ApiV1PostController {
         Member actor = rq.getActor();
         Post post = postService.findById(id).get();
         post.checkActorDelete(actor);
-
-        if (!actor.equals(post.getAuthor())) throw new ServiceException("403-1", "삭제 권한이 없습니다.");
 
         postService.delete(id);
 

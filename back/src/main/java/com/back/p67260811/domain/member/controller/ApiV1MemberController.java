@@ -6,6 +6,7 @@ import com.back.p67260811.domain.member.service.MemberService;
 import com.back.p67260811.global.dto.RsData;
 import com.back.p67260811.global.exception.ServiceException;
 import com.back.p67260811.global.rq.Rq;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/members")
+@SecurityRequirement(name = "bearerAuth")
 public class ApiV1MemberController {
 
     private final MemberService memberService;
@@ -101,6 +103,16 @@ public class ApiV1MemberController {
                         new MemberDto(actor),
                         actor.getApiKey()
                 )
+        );
+    }
+    @DeleteMapping("/logout")
+    public RsData<Void> logout() {
+
+        rq.deleteCookie("apiKey");
+
+        return new RsData<>(
+                "200-1",
+                "로그아웃 되었습니다."
         );
     }
 
