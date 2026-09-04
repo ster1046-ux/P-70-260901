@@ -21,7 +21,7 @@ public class Ut {
             Claims claims = claimsBuilder.build();
 
             Date issuedAt = new Date();
-            Date expiration = new Date(issuedAt.getTime() + 1000L * expireSeconds);
+            Date expiration = new Date(issuedAt.getTime() + expireSeconds);
 
             Key secretKey = Keys.hmacShaKeyFor(secret.getBytes());
 

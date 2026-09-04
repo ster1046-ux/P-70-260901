@@ -20,5 +20,5 @@ public class AuthTokenService {
                 Map.of("id", member.getId(), "username", member.getUsername())
         );
     }
-    
+
 }

@@ -27,14 +27,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class AuthTokenServiceTest {
     @Autowired
     private AuthTokenService authTokenService;
+    @Autowired
+    private MemberRepository memberRepository;
 
     private long expireMills = 1000L * 60 * 10;
     private String secretPattern= "abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890";
 
-    @Autowired
-    private MemberService memberService;
-    @Autowired
-    private MemberRepository memberRepository;
 
     @Test
     @DisplayName("authTokenService 서비스가 존재한다.")
@@ -53,14 +51,27 @@ public class AuthTokenServiceTest {
         Date issuedAt = new Date();
         Date expiration = new Date(issuedAt.getTime() + expireMills);
 
+        Map<String, Object> payload = Map.of("name", "Paul", "age", 23);
+
+        // JSON ==> Map
         String jwt = Jwts.builder()
-                .claims(Map.of("name", "Paul", "age", 23)) // 내용
+                .claims(payload) // 내용
                 .issuedAt(issuedAt) // 생성날짜
                 .expiration(expiration) // 만료날짜
                 .signWith(secretKey) // 키 서명
                 .compact();
 
         assertThat(jwt).isNotBlank();
+
+        Map<String, Object> parsedPayload = (Map<String, Object>) Jwts
+                .parser()
+                .verifyWith(secretKey)
+                .build()
+                .parse(jwt)
+                .getPayload();
+
+        assertThat(parsedPayload)
+                .containsAllEntriesOf(payload);
 
         System.out.println("jwt = " + jwt);
     }
@@ -78,6 +89,7 @@ public class AuthTokenServiceTest {
 
         System.out.println("jwt = " + jwt);
     }
+
     @Test
     @DisplayName("AuthTokenService를 통해서 accessToken 생성")
     void t4() {
